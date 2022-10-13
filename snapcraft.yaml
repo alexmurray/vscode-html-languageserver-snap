@@ -1,5 +1,5 @@
 name: vscode-html-languageserver
-summary: HTML Language Server
+summary: HTML Language Server extracted from VSCode
 description: |
   Features
   * Completion provider
