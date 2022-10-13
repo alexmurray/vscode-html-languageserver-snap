@@ -1,0 +1,69 @@
+name: vscode-html-languageserver
+summary: HTML Language Server
+description: |
+  Features
+  * Completion provider
+  * Formatting
+  * Document Symbols & Highlights
+  * Document Links
+  * CSS mode
+  * Javascript mode
+
+adopt-info: vscode-html-languageserver
+grade: stable
+confinement: strict
+base: core20
+
+layout:
+  /usr/local/share/.config/yarn:
+    bind: $SNAP/usr/local/share/.config/yarn
+
+apps:
+  vscode-html-languageserver:
+    command: bin/node $SNAP/usr/local/share/.config/yarn/global/node_modules/vscode-html-languageserver/out/node/htmlServerMain.js
+    plugs:
+      - network
+      - home
+
+parts:
+  vscode-html-languageserver:
+    plugin: npm
+    source: https://github.com/microsoft/vscode.git
+    build-environment:
+      - NODEJS_VERSION: "v16.17.1"
+    npm-node-version: $NODEJS_VERSION
+    # add packages so we can npm install on vscode itself as it's node
+    # dependecies are needed to compile the json-languageserver
+    build-packages:
+      - pkg-config
+      - python
+      - libx11-dev
+      - libxkbfile-dev
+      - libsecret-1-dev
+      - jq
+      - moreutils
+    override-build: |
+      # install the official nodejs so we get the expected npm version
+      if [ $SNAP_ARCH == "amd64" ]; then
+        ARCH=x64
+      elif [ $SNAP_ARCH == "armhf" ]; then
+        ARCH=armv7l
+      elif [ $SNAP_ARCH == "ppc64el" ]; then
+        ARCH=ppc64le
+      else
+        ARCH=$SNAP_ARCH
+      fi
+      curl -s https://nodejs.org/dist/"${NODEJS_VERSION}"/node-"${NODEJS_VERSION}"-linux-$ARCH.tar.gz | tar xzf - -C "$SNAPCRAFT_PART_INSTALL" --strip-components=1
+      npm install -g yarn
+      npm install -g gulp
+      yarn install
+      cd extensions/html-language-features/server
+      yarn install
+      yarn run compile
+      yarn global add --prefix $SNAPCRAFT_PART_INSTALL $(yarn pack . | grep "Wrote tarball to" | cut -f2 -d'"')
+      # install typescript manually as a dependency
+      yarn global add --prefix $SNAPCRAFT_PART_INSTALL typescript
+      # fixup install location
+      mkdir -p $SNAPCRAFT_PART_INSTALL/usr/local/share/.config
+      mv /usr/local/share/.config/yarn $SNAPCRAFT_PART_INSTALL/usr/local/share/.config
+      snapcraftctl set-version $(jq -r .version package.json)
