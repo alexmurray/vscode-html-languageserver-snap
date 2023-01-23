@@ -67,6 +67,7 @@ parts:
       jq 'del(.devDependencies."vscode-telemetry-extractor")' package.json | sponge package.json
       jq 'del(.devDependencies.electron)' package.json | sponge package.json
       jq 'del(.devDependencies.playwright)' package.json | sponge package.json
+      yarn why vscode-ripgrep
       yarn install
       cd extensions/html-language-features/server
       yarn install
