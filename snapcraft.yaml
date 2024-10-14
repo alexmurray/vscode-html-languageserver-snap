@@ -68,11 +68,9 @@ parts:
       jq 'del(.devDependencies."@vscode/telemetry-extractor")' package.json | sponge package.json
       jq 'del(.devDependencies.electron)' package.json | sponge package.json
       jq 'del(.devDependencies.playwright)' package.json | sponge package.json
-      yarn why @vscode/ripgrep
       # same for spdlog
       jq 'del(.dependencies."@vscode/spdlog")' package.json | sponge package.json
       jq 'del(.dependencies."@vscode/spdlog")' remote/package.json | sponge remote/package.json
-      yarn why @vscode/spdlog
       yarn global add node-gyp
       yarn install
       cd extensions/html-language-features/server
