@@ -30,6 +30,7 @@ parts:
     # add packages so we can npm install on vscode itself as it's node
     # dependecies are needed to compile the html-languageserver
     build-packages:
+      - curl
       - gcc
       - g++
       - pkg-config
