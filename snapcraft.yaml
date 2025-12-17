@@ -14,6 +14,11 @@ grade: stable
 confinement: strict
 base: core24
 
+# various dependencies limit to only amd64 and arm64
+platforms:
+  amd64:
+  arm64:
+
 apps:
   vscode-html-languageserver:
     command: bin/node $SNAP/lib/node_modules/vscode-html-languageserver/out/node/htmlServerMain.js
